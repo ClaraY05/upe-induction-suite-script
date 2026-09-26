@@ -1,4 +1,4 @@
-# UPE Induction Suite Provisioner
+# UPE Induction Suite Script
 
 An Apps Script that sets up the Google Drive folder for a new induction quarters of [Upsilon Pi Epsilon at UCLA](https://upe.seas.ucla.edu/). It copies the template folder, renames everything for the new term, locks forms to org accounts, and fixes the `IMPORTRANGE` links so the new sheets point at each other instead of the template. It also works as a general tool for deep-copying a Drive folder.
 
