@@ -24,7 +24,7 @@ The first time you run it, Google will ask for permission to manage your files. 
 
 ## Development
 
-The code lives on GitHub and is synced to Apps Script with the [Google Apps Script GitHub Assistant](https://chromewebstore.google.com/detail/google-apps-script-github/lfjcgcmalmhaijdkgjgodfdhdfcedijl) Chrome extension.
+The code lives on GitHub and is synced to Apps Script with the [Google Apps Script GitHub Assistant](https://chromewebstore.google.com/detail/google-apps-script-github/lfjcgcmkmjjlieihflfhjopckgpelofo) Chrome extension.
 
 **Setup:** Install the extension, create a GitHub personal access token (classic) with `repo` scope, then open **Extensions → Apps Script** from the sheet. Paste the token into the extension settings and link it to `your-org/induction-quarter-provisioner` on `main` (or your branch).
 
