@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UPE I&amp;M Suite Script</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2774ae; --blue-dark: #005587; --navy: #003b5c; --gold: #ffd100; --gold-dark: #ffb81c;
+      --bg: #f4f6f8; --text: #1b2a38; --muted: #5b6b7a; --faint: #8795a2; --line: #d9e1e8;
+      --err: #b3261e; --err-bg: #fdecea; --ok: #1e6b3a; --ok-bg: #eaf6ee;
+      --heading: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+      --body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+    a { color: var(--blue); } a:hover { color: var(--blue-dark); }
+    .hero { background: linear-gradient(160deg, var(--navy), var(--blue-dark) 70%); color: #fff; padding: 64px 20px 120px; }
+    .hero-inner, .page { max-width: 640px; margin: 0 auto; }
+    h1 { font-family: var(--heading); font-weight: 400; font-size: 44px; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 16px; }
+    h1 strong { font-weight: 800; color: var(--gold); }
+    .lede { margin: 0; max-width: 540px; color: rgba(255,255,255,.85); font-size: 17px; }
+    .page { padding: 0 20px 56px; margin-top: -76px; }
+    .card { background: #fff; border-radius: 8px; padding: 32px; box-shadow: 0 10px 30px rgba(0, 59, 92, .12); border-top: 4px solid var(--gold); }
+    .field { display: grid; grid-template-columns: 36px 1fr; column-gap: 14px; padding: 20px 0; border-top: 1px solid var(--line); }
+    .field:first-child { border-top: 0; padding-top: 0; }
+    .num { width: 32px; height: 32px; border-radius: 50%; background: var(--blue); color: #fff; font-family: var(--heading); font-weight: 700; font-size: 14px; display: grid; place-items: center; }
+    label { display: block; font-family: var(--heading); font-weight: 700; font-size: 15px; line-height: 1.3; margin: 6px 0 10px; color: var(--navy); }
+    label .req { color: var(--blue); }
+    input { width: 100%; min-height: 44px; padding: 10px 14px; font: inherit; font-size: 15px; color: var(--text); background: #fff; border: 1px solid var(--line); border-radius: 6px; transition: border-color .15s, box-shadow .15s; }
+    input::placeholder { color: var(--faint); }
+    input:hover { border-color: #b7c4cf; }
+    input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(39, 116, 174, .2); }
+    input.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; }
+    input.invalid { border-color: var(--err); }
+    .hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .hint.err { color: var(--err); }
+    button { width: 100%; margin-top: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; cursor: pointer; font-family: var(--heading); font-weight: 700; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--navy); background: var(--gold); border: 0; border-radius: 6px; transition: background .15s, transform .05s; }
+    button:hover { background: var(--gold-dark); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+    button:disabled { opacity: .6; cursor: progress; }
+    button svg { width: 18px; height: 18px; }
+    #status { display: none; margin-top: 20px; border-radius: 6px; padding: 18px 20px; font-size: 15px; border: 1px solid var(--line); }
+    #status.show { display: block; }
+    .st-title { font-family: var(--heading); font-weight: 700; font-size: 16px; line-height: 1.3; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; color: var(--navy); }
+    .st-title svg { width: 20px; height: 20px; flex: none; }
+    .st-body { color: var(--muted); margin: 0; }
+    .bar { position: relative; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin-top: 14px; }
+    .bar::after { content: ""; position: absolute; inset: 0; width: 35%; border-radius: 2px; background: var(--blue); animation: slide 1.4s ease-in-out infinite; }
+    @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+    #status.loading { background: #eef5fb; border-color: #cfe2f1; }
+    #status.success { background: var(--ok-bg); border-color: #c4e6cf; }
+    #status.success .st-title { color: var(--ok); }
+    #status.error { background: var(--err-bg); border-color: #f5c6c2; }
+    #status.error .st-title, #status.error .st-body { color: var(--err); }
+    dl { display: grid; grid-template-columns: 1fr auto; margin: 12px 0 16px; }
+    dt, dd { margin: 0; padding: 8px 0; border-bottom: 1px solid #c4e6cf; }
+    dt { color: var(--muted); }
+    dd { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .link { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-family: var(--heading); font-weight: 700; font-size: 14px; text-decoration: none; }
+    .link:hover { color: var(--blue-dark); text-decoration: underline; }
+    .link svg { width: 15px; height: 15px; }
+    .warn { margin: 0 0 16px; padding: 12px 14px 12px 32px; background: #fff8e1; border: 1px solid #f3dc8b; border-radius: 6px; font-size: 14px; color: #6b5200; }
+    .warn li { margin: 2px 0; }
+    @media (max-width: 520px) { h1 { font-size: 34px; } .card { padding: 24px 20px; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>UPE I&amp;M Suite <strong>Script</strong></h1>
+      <p class="lede">Recursively clones all folders, re-links Forms to response Sheets, replaces &ldquo;TERM&rdquo; everywhere, and preserves smart chips.</p>
+    </div>
+  </header>
+  <main class="page">
+    <div class="card">
+      <div class="field">
+        <div class="num">1</div>
+        <div>
+          <label for="newTerm">New Quarter / Term Name <span class="req">*</span></label>
+          <input type="text" id="newTerm" placeholder="e.g. Fall 2026, Cohort 15" autofocus>
+          <div class="hint" id="termHint">Replaces the keyword &ldquo;TERM&rdquo; in all documents, subfolders, and formulas.</div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="num">2</div>
+        <div>
+          <label for="folderId">Template Folder ID or URL</label>
+          <input type="text" id="folderId" class="mono" value="<?= defaultTemplateId ?>" placeholder="Folder ID or URL">
+          <div class="hint">The master template folder (never modified).</div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="num">3</div>
+        <div>
+          <label for="destFolderId">Destination Parent Folder ID or URL</label>
+          <input type="text" id="destFolderId" class="mono" value="<?= defaultDestId ?>" placeholder="Destination folder ID or URL">
+          <div class="hint">Where the new quarter folder tree will be created.</div>
+        </div>
+      </div>
+
+      <button id="runBtn" onclick="runAutomation()"></button>
+      <div id="status" role="status" aria-live="polite"></div>
+    </div>
+  </main>
+
+  <script>
+    var ICON = {
+      play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>',
+      spin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+      alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>',
+      out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>'
+    };
+    var btn = document.getElementById("runBtn");
+    var statusDiv = document.getElementById("status");
+    var termInput = document.getElementById("newTerm");
+    var termHint = document.getElementById("termHint");
+    var hintText = termHint.innerHTML;
+
+    function setIdle() { btn.disabled = false; btn.innerHTML = ICON.play + "<span>Run Provisioning</span>"; }
+    setIdle();
+
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+    termInput.addEventListener("input", function () {
+      termInput.classList.remove("invalid");
+      termHint.classList.remove("err");
+      termHint.innerHTML = hintText;
+    });
+    termInput.addEventListener("keydown", function (e) { if (e.key === "Enter") runAutomation(); });
+
+    function runAutomation() {
+      var term = termInput.value.trim();
+      var folderId = document.getElementById("folderId").value.trim();
+      var destFolderId = document.getElementById("destFolderId").value.trim();
+
+      if (!term) {
+        termInput.classList.add("invalid");
+        termHint.classList.add("err");
+        termHint.textContent = "Please enter the new quarter/term name.";
+        termInput.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = ICON.spin + "<span>Provisioning&hellip;</span>";
+      statusDiv.className = "show loading";
+      statusDiv.innerHTML =
+        '<div class="st-title">Copying, relinking Forms &amp; scanning documents</div>' +
+        '<p class="st-body">Recursively duplicating all subfolders, linking Forms to Sheets, and re-linking formulas. Please keep this tab open.</p>' +
+        '<div class="bar"></div>';
+
+      google.script.run
+        .withSuccessHandler(function (res) {
+          setIdle();
+          var warnings = (res && res.warnings) || [];
+          var warnHtml = warnings.length
+            ? '<ul class="warn">' + warnings.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join("") + '</ul>'
+            : '';
+          var pendingHtml = res.pending
+            ? '<p class="st-body" style="margin-bottom:12px">' + esc(res.pending) + ' item(s) are still being processed in the background ' +
+              '(Apps Script has a 6-minute limit). A &ldquo;_Provisioning report&rdquo; file will appear in the new folder when everything is done.</p>'
+            : '';
+          statusDiv.className = "show success";
+          statusDiv.innerHTML =
+            '<div class="st-title">' + ICON.check + (res.pending ? 'Files copied, finishing in background' : 'Provisioning complete') + '</div>' +
+            pendingHtml +
+            '<dl>' +
+              '<dt>New folder</dt><dd>' + esc(res.newFolderName) + '</dd>' +
+              '<dt>Subfolders created</dt><dd>' + esc(res.foldersCopied) + '</dd>' +
+              '<dt>Files processed</dt><dd>' + esc(res.filesCopied) + '</dd>' +
+              '<dt>Forms linked to Sheets</dt><dd>' + esc(res.formsRelinked) + '</dd>' +
+              '<dt>Warnings</dt><dd>' + esc(warnings.length) + '</dd>' +
+              '<dt>Time</dt><dd>' + esc(res.seconds) + 's</dd>' +
+            '</dl>' +
+            warnHtml +
+            '<a class="link" href="' + esc(res.newFolderUrl) + '" target="_blank" rel="noopener">Open new folder in Google Drive' + ICON.out + '</a>';
+        })
+        .withFailureHandler(function (err) {
+          setIdle();
+          statusDiv.className = "show error";
+          statusDiv.innerHTML =
+            '<div class="st-title">' + ICON.alert + 'Something went wrong</div>' +
+            '<p class="st-body">' + esc(err && err.message ? err.message : err) + '</p>';
+        })
+        .executeFromWeb(folderId, destFolderId, term);
+    }
+  </script>
+</body>
+</html>
