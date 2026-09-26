@@ -34,15 +34,25 @@ The code lives on GitHub and is synced to Apps Script with the [Google Apps Scri
 
 ## Configuration
 
-Edit the `CONFIG` object at the top of `Code.gs`:
+Edit the `CONFIG` object within `Config.gs:
 
 ```javascript
 const CONFIG = {
-  DEFAULT_TEMPLATE_FOLDER_ID: "1aBcDeFgHiJkLmNoPqRsTuVwXyZ12345", // pre-fills the prompt
-  DESTINATION_PARENT_FOLDER_ID: "",  // blank = create new folder next to the template
-  KEYWORD_TO_REPLACE: "TERM",        // placeholder in file names and formulas
-  REQUIRE_ORG_LOGIN: true,           // responders must sign in with an org account
-  COLLECT_RESPONDER_EMAIL: true,     // record the signed-in email
-  LIMIT_ONE_RESPONSE: false          // one submission per person
+  DEFAULT_TEMPLATE_FOLDER_ID: "",
+  DESTINATION_PARENT_FOLDER_ID: "",
+  KEYWORD_TO_REPLACE: "TERM",
+
+  MATCH_CASE: true,   // only "TERM", never "term"/"Term"
+  WHOLE_WORD: true,   // never touches DETERMINE / MIDTERM / TERMS
+
+  REQUIRE_ORG_LOGIN: true,
+  COLLECT_RESPONDER_EMAIL: true,
+  LIMIT_ONE_RESPONSE: false,
+  PUBLISH_FORMS: true,
+
+  SPAWNED_FORM_RETRIES: 5,
+  SPAWNED_FORM_WAIT_MS: 1500,
+
+  MAX_RUNTIME_MS: 4.5 * 60 * 1000,
 };
 ```
